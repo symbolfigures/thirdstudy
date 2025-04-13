@@ -111,6 +111,7 @@ def bezier(
 		prog_bar.add(1)
 	#print(f'vectors shape: ({len(vectors)}, {len(vectors[0])})')
 	generate(generator, vectors, subdir_out)
+	return subdir_out
 
 
 def sine_phases(seedvec, sec=60, fps=30):
@@ -139,6 +140,7 @@ def sine(
 	seedvec = np.random.normal(size=(1, dims))
 	waves = sine_phases(seedvec)
 	generate(generator, np.transpose(waves), subdir_out)
+	return subdir_out
 
 
 if __name__ == '__main__':

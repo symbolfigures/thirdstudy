@@ -1,5 +1,6 @@
 .venv/
 data/scan/
+gen/model/
 gen/out/
 gen/src/__pycache__/
 gen/src/gan/__pycache__/

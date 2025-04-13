@@ -16,9 +16,9 @@ def png_to_mp4(dir_in):
 def main(style, model, dir_out, frames, segments):
 
 	if args.style == 'bezier':
-		bezier(model, dir_out, frames, segments)
+		dir_out = bezier(model, dir_out, frames, segments)
 	if style == 'sine':
-		sine(model, dir_out, frames)
+		dir_out = sine(model, dir_out, frames)
 
 	png_to_mp4(dir_out)
 
