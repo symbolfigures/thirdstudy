@@ -1,0 +1,5 @@
+.venv/
+data/scan/field_dpi300/
+train/src/__pycache__/
+gen/src/gan/__pycache__/
+train/out/
