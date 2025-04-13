@@ -6,6 +6,9 @@ Scripts that
 - fill generated images with color to create a synthetic dataset.
 - make animations by orchestrating transformations through the model's latent space.
 
+The basic idea: [INPUT](https://symbolfigures.io/thirdstudy/png/2-01.png)
+[OUTPUT](https://symbolfigures.io/thirdstudy/anim/sample.mp4)
+
 The drawings I use are from my [Third Study](https://symbolfigures.io/thirdstudy.html). Generally, comptible drawings
 - fill the page within some rectangular margin.
 - may be flipped, and rotated by any degree.
