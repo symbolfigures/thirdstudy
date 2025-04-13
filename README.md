@@ -14,7 +14,7 @@ The drawings I use are from my [Third Study](https://symbolfigures.io/thirdstudy
 - may be flipped, and rotated by any degree.
 - have dark lines on a light background.
 
-The model is trained with a generative adversarial network (GAN). The code for the GAN is originally from [Brad Klingensmith's course on Udemy](https://www.udemy.com/course/high-resolution-generative-adversarial-networks), which is in turn based off [ProGAN](https://arxiv.org/abs/1710.10196) with improvements from [StyleGAN2](https://arxiv.org/abs/1912.04958).
+The model is trained with a generative adversarial network (GAN). The code for the GAN is originally from a [course](https://www.udemy.com/course/high-resolution-generative-adversarial-networks) by Brad Klingensmith, which is in turn based off [ProGAN](https://arxiv.org/abs/1710.10196) with improvements from [StyleGAN2](https://arxiv.org/abs/1912.04958).
 
 Scripts in this repo which are only derivations of the GAN are located at:
 - [train/src/](train/src/)
