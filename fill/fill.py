@@ -12,7 +12,7 @@ sys.setrecursionlimit(10000000)
 
 
 def get_colors():
-	img = Image.open('palette.jpg')
+	img = Image.open('palette.png')
 	colors = []
 	for x in range(img.width):	
 		for y in range(img.height):
@@ -23,75 +23,14 @@ colors = get_colors()
 
 
 def bitmap(img):
-	img.convert('L')
+	img = img.convert('L')
 	array = np.array(img)
-	# bitmap
-	array = np.where(array > 192, 255, 0).astype(np.uint8)
-	# white out pixels near edge
-	margin = 32
-	h, w = array.shape
-	mask = np.zeros_like(array, dtype=bool)
-	mask[:margin, :] = True # top
-	mask[-margin:, :] = True # bottom
-	mask[:, :margin] = True # left
-	mask[:, -margin:] = True # right
-	array[(array == 0) & mask] = 255
+	array = np.where(array > 128, 255, 0).astype(np.uint8)
 	return Image.fromarray(array.astype(np.uint8))
 
 
-def get_max_radius1(img, origin):
-	x = 0
-	y = origin[1]
-	while(img.getpixel((x, y)) == (255, 255, 255)):
-		x += 1
-	rad_x = origin[0] - x
-	y = 0
-	x = origin[0]
-	while(img.getpixel((x, y)) == (255, 255, 255)):
-		y += 1
-	rad_y = origin[1] - y
-	return max(rad_x, rad_y)
-
-
-def get_max_radius(img, origin, margin=50):
-	xn, xp, yn, yp = 0, 0, 0, 0
-	(x, y) = origin
-	p = 0
-	while(p < origin[0] - margin):
-		if img.getpixel((x-p, y)) == (0, 0, 0):
-			xn = p
-		p += 1
-	p = 0
-	while(p < origin[0]):
-		if img.getpixel((x+p, y)) == (0, 0, 0):
-			xp = p
-		p += 1
-	p = 0
-	while(p < origin[1]):
-		if img.getpixel((x, y-p)) == (0, 0, 0):
-			yn = p
-		p += 1
-	p = 0
-	while(p < origin[1]):
-		if img.getpixel((x, y+p)) == (0, 0, 0):
-			yp = p
-		p += 1
-	return max(xn, xp, yn, yp)
-
-
-def gen_points(o, r, spacing=1):
-	C4 = (2 * math.pi * r) / 4 # C4 = circumference divided by 4
-	num_points = max(1, int(C4 / spacing)) # at least 1 point, num_points proportional to C4
-	points = []
-	for i in range(num_points):
-		theta = (math.pi / 2) * (i / num_points)
-		x = o[0] - r * math.cos(theta)
-		y = o[1] - r * math.sin(theta)
-		points.append((int(x), int(y)))
-	return points
-
-
 def fill_shape(point, color, img, draw):
+	(w, h) = img.size
 	(x, y) = point
 	pix = []
 	pix_set = set()
@@ -103,11 +42,11 @@ def fill_shape(point, color, img, draw):
 		pix_set.add((x, y))
 		if x > 0 and (x - 1, y) not in pix_set:
 			gather_pix(x - 1, y)
-		if x < img.width - 1 and (x + 1, y) not in pix_set:
+		if x < w - 1 and (x + 1, y) not in pix_set:
 			gather_pix(x + 1, y)
 		if y > 0 and (x, y - 1) not in pix_set:
 			gather_pix(x, y - 1)
-		if y < img.height - 1 and (x, y + 1) not in pix_set:
+		if y < h - 1 and (x, y + 1) not in pix_set:
 			gather_pix(x, y + 1)
 
 	gather_pix(x, y)
@@ -118,7 +57,9 @@ def fill_shape(point, color, img, draw):
 	return pix
 
 
-def neighborhood(q, img): # is every pixel in the neighborhood white
+def neighborhood(q, img):
+	# is every pixel in the neighborhood white
+	(w, h) = img.size
 	(x, y) = q
 	neighbors = []
 	neighbors.extend([
@@ -128,35 +69,16 @@ def neighborhood(q, img): # is every pixel in the neighborhood white
 		(x+1, y-1), (x+1, y), (x+1, y+1),
 		(x+2, y)
 	])
-	for p in neighbors:
-		if img.getpixel(p) != (255, 255, 255):
-			return False
-			break
+	for (xi, yi) in neighbors:
+		if 0 <= xi < w and 0 <= yi < h:
+			if img.getpixel(p) != (255, 255, 255):
+				return False
+				break
 	return True
 
 
-def fill_if_symmetric(p, img, draw, origin):
-	(xn, yn) = p
-	xp = xn + 2 * (origin[0] - xn)
-	yp = yn + 2 * (origin[1] - yn)
-	quads = [
-		(xn, yn),
-		(xp, yn),
-		(xn, yp),
-		(xp, yp)
-	]
-	symmetric = True
-	for q in quads:
-		if not neighborhood(q, img):
-			symmetric = False
-			break
-	if symmetric:
-		color = colors[randrange(len(colors))]
-		for q in quads:
-			fill_shape(q, color, img, draw)
-
-
-def fill_line(x, y, bb, img, draw):
+def fill_line(x, y, img, draw):
+	(w, h) = img.size
 	z = 0
 	while True:
 		z += 1
@@ -170,22 +92,26 @@ def fill_line(x, y, bb, img, draw):
 			(x, y + z),
 			(x + z, y + z)]
 		shuffle(box)
-		for (i, j) in box:
-			if bb[0] <= i < bb[1] and bb[2] <= j < bb[3]:
-				color = img.getpixel((i, j))
+		for (xi, yi) in box:
+			if 0 <= xi < w and 0 <= yi < h:
+				color = img.getpixel((xi, yi))
 				if color != (0, 0, 0):
 					draw.point((x, y), fill=color)
 					return
 
 
-def blend(x, y, bb, img):
+def blend_px(x, y, img):
+	(w, h) = img.size
 	box = [
 		(x-1, y-1), (x-1, y), (x-1, y+1),
 		(x, y-1), (x, y), (x, y+1),
 		(x+1, y-1), (x+1, y), (x+1, y+1)]
 	r, g, b = 0, 0, 0
-	for p in box:
-		c = img.getpixel(p)
+	for (xi, yi) in box:
+		if 0 <= xi < w and 0 <= yi < h:
+			c = img.getpixel((xi, yi))
+		else:
+			c = img.getpixel((x,y))
 		r += c[0]
 		g += c[1]
 		b += c[2]
@@ -194,70 +120,46 @@ def blend(x, y, bb, img):
 
 
 def process(args):
-	dir_in, filename, dir_out = args
+	dir_in, filename, dir_out, blend = args
 
-	img = Image.open(os.path.join(dir_in, filename))
-	img = bitmap(img)
-	img = img.convert('RGB')
+	img = Image.open(f'{dir_in}/{filename}')
+	img = bitmap(img).convert('RGB')
 	draw = ImageDraw.Draw(img)
+	(w, h) = img.size
 
-	origin = (img.width // 2, img.height // 2) # set origin at center of page
-	#max_radius = get_max_radius(img) + 10
-	max_radius = get_max_radius(img, origin) + 10
-	bb = (
-		origin[0] - max_radius,
-		origin[0] + max_radius,
-		origin[1] - max_radius,
-		origin[1] + max_radius)
-
-	# mask environment (inside and outside of dilly)
-	mask = []
-	for p in [(0, 0), (origin[0], origin[1])]:
-		mask.extend(fill_shape(p, (0, 255, 0), img, draw))
-
-	# iterate over points on the dilly
-	for radius in range(4, max_radius, 1):
-		points = gen_points(origin, radius)
-		for p in points:
-			#draw.point(p, fill=(255, 0, 0)) # test
-			if img.getpixel(p) == (255, 255, 255):
-				fill_if_symmetric(p, img, draw, origin)
-
-	# iterate over points that are still white
-	for x in range(bb[0], bb[1], 1):
-		for y in range(bb[2], bb[3], 1):
+	# fill space
+	for x in range(w):
+		for y in range(h):
 			if img.getpixel((x, y)) == (255, 255, 255):
 				color = colors[randrange(len(colors))]
 				fill_shape((x, y), color, img, draw)
 
-	# unmask environment
-	for p in mask:
-		draw.point(p, fill=(255, 255, 255))
-
-	# fill black lines
-	for x in range(bb[0], bb[1], 1):
-		for y in range(bb[2], bb[3], 1):
+	# fill line
+	for x in range(0, w, 1):
+		for y in range(0, h, 1):
 			if img.getpixel((x, y)) == (0, 0, 0):
-				fill_line(x, y, bb, img, draw)
+				fill_line(x, y, img, draw)
 
 	# blend
-	trace = img
-	for x in range(bb[0], bb[1], 1):
-		for y in range(bb[2], bb[3], 1):
-			color = blend(x, y, bb, trace)
-			draw.point((x, y), color)
+	if blend:
+		trace = img
+		for x in range(0, w, 1):
+			for y in range(0, h, 1):
+				color = blend_px(x, y, trace)
+				draw.point((x, y), color)
 
-	img.save(os.path.join(dir_out, filename))
+	img.save(f'{dir_out}/{filename}')
 
 
-def super_process(dir_in, x, dir_out):
+def main(dir_in, dir_out, blend):
+	os.makedirs(dir_out, exist_ok=True)
 	filenames = os.listdir(dir_in)
-	args_list = [(dir_in, x, dir_out) for x in filenames]
+	args = [(dir_in, x, dir_out, blend) for x in filenames]
 	with ProcessPoolExecutor() as executor:
-		executor.map(process, args_list)
+		executor.map(process, args)
 
 
-def main(dir_in_sup, dir_out_sup):
+def main1(dir_in_sup, dir_out_sup):
 	filenames_sup = os.listdir(dir_in_sup)
 	for x_sup in filenames_sup:
 		dir_in = os.path.join(dir_in_sup, x_sup)
@@ -275,14 +177,19 @@ if __name__ == '__main__':
 		'--dir_in',
 		type=str,
 		required=True,
-		help='folder of random images e.g. ../anim/out/random')
+		help='path to source images folder')
 	parser.add_argument(
 		'--dir_out',
 		type=str,
 		default='out',
 		help='output folder')
+	parser.add_argument(
+		'--blend',
+		action='store_true',
+		default=False,
+		help='blend edges of shapes, no GPU support')
 	args = parser.parse_args()
-	main(args.dir_in, args.dir_out)
+	main(args.dir_in, args.dir_out, args.blend)
 
 
 
