@@ -1,5 +1,12 @@
 .venv/
-data/scan/field_dpi300/
-train/src/__pycache__/
+data/scan/
+gen/out/
+gen/src/__pycache__/
 gen/src/gan/__pycache__/
 train/out/
+train/src/<=2025-01/
+train/src/__pycache__/
+train/src/bk_src.zip
+
+
+

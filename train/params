@@ -8,5 +8,5 @@ init
 --visualization-smoothing-sample-count=10000
 --beta-1=0.0
 --beta-2=0.99
-/absolute/path/to/*.tfrecord
-/absolute/path/to/out
+</absolute/path/to/*.tfrecord>
+</absolute/path/to/out>

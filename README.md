@@ -82,14 +82,14 @@ Includes a further reduced GAN only capable of inference.
 
 `cd gen`
 
-Random images, good for sythetic datasets.  
-`python generate.py --model="field-300-1024"`
+Generate random images for sythetic datasets.  
+`python src/generate.py --model="<modelpath>"`
 
-Animation: continuous transformation follows a bezier curve passing through the model's n-dimensional latent space.  
-`python anim.py --style="bezier" --model="field-300-1024"`
+Animation: continuous transformation follows a bezier curve passing through the model's _n_-dimensional latent space.  
+`python src/anim.py --style="bezier" --model="<modelpath>"`
 
 Animation: dimensions of the latent space are modulated by a sine wave. The sine waves have constant period and variable phases.  
-`python anim.py --style="sine" --model="field-300-1024"`
+`python src/anim.py --style="sine" --model="<modelpath>"`
 
 `cd ../`
 
@@ -97,7 +97,10 @@ Animation: dimensions of the latent space are modulated by a sine wave. The sine
 
 `cd fill`
 
-Given a set of random generated images, fill the shapes with color and remove the lines in between.  
+Given a set of random generated images,
+- fill the shapes with color
+- remove the lines in between
+- blend edges  
 `python fill.py --dir_in="../anim/out/random"`
 
 `cd ../`

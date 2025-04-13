@@ -13,12 +13,11 @@ def png_to_mp4(dir_in):
 	)
 
 
-def main(args):
-	style, model, dir_out, frames, segments = args
+def main(style, model, dir_out, frames, segments):
 
-	if style = 'bezier':
+	if args.style == 'bezier':
 		bezier(model, dir_out, frames, segments)
-	if style = 'sine':
+	if style == 'sine':
 		sine(model, dir_out, frames)
 
 	png_to_mp4(dir_out)
@@ -32,13 +31,13 @@ if __name__ == '__main__':
 		'--style',
 		type=str,
 		required=True,
-		choice=['bezier', 'sine'],
+		choices=['bezier', 'sine'],
 		help='either bezier or sine')
 	parser.add_argument(
 		'--model',
 		type=str,
 		required=True,
-		help='model used to generate images')
+		help='path to model used to generate images')
 	parser.add_argument(
 		'--dir_out',
 		type=str,
@@ -56,7 +55,7 @@ if __name__ == '__main__':
 		help='number of points in the vector space for bezier curve to pass through')
 
 	args = parser.parse_args()
-	main(args)
+	main(args.style, args.model, args.dir_out, args.frames, args.segments)
 
 
 

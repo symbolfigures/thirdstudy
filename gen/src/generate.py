@@ -10,15 +10,14 @@ from train import TrainingState
 import uuid
 
 
-def load_generator(model, path='model'):
-	with open(f'{path}/{model}', 'rb') as f:
+def load_generator(model):
+	with open(model, 'rb') as f:
 		bytes = f.read()
 	training_state: TrainingState = pickle.loads(bytes)
 	return training_state.visualization_generator
 
 
-def generate(model, vectors, dir_out, batch_size=32):
-	generator = load_generator(model)
+def generate(generator, vectors, dir_out, batch_size=16):
 	prog_bar = tf.keras.utils.Progbar(len(vectors) // batch_size)
 	vectors = tf.convert_to_tensor(vectors)
 	for start in range(0, len(vectors), batch_size): # vectors.shape[0] ---> len(vectors)
@@ -68,7 +67,7 @@ def random(
 		count=count) 
 	noise_shape = generator.input_shape[-1]
 	vectors = tf.random.normal((count, noise_shape))
-	generate(vectors, subdir_out)
+	generate(generator, vectors, subdir_out)
 
 
 def bezier_interpolation(p0, p1, p2, p3, p4, frames):
@@ -111,7 +110,7 @@ def bezier(
 		vectors.extend(bezier_interpolation(p0, p1, p2, p3, p4, frames))
 		prog_bar.add(1)
 	#print(f'vectors shape: ({len(vectors)}, {len(vectors[0])})')
-	generate(vectors, subdir_out)
+	generate(generator, vectors, subdir_out)
 
 
 def sine_phases(seedvec, sec=60, fps=30):
@@ -139,7 +138,7 @@ def sine(
 	os.makedirs(subdir_out, exist_ok=True)
 	seedvec = np.random.normal(size=(1, dims))
 	waves = sine_phases(seedvec)
-	generate(np.transpose(waves), subdir_out)
+	generate(generator, np.transpose(waves), subdir_out)
 
 
 if __name__ == '__main__':
@@ -148,11 +147,11 @@ if __name__ == '__main__':
 		'--model',
 		type=str,
 		required=True,
-		help='model used to generate images')
+		help='path to model used to generate images')
 	parser.add_argument(
 		'--dir_out',
 		type=str,
-		default=f'out/random/{time.time()}',
+		default=f'out',
 		help='output folder')
 	parser.add_argument(
 		'--count',
