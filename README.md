@@ -40,13 +40,13 @@ Alternatively, freeze.txt has all the dependencies and versions explicit.
 
 `cd data`
 
-[rgby.py](data/rgba.py): Convert to RGBA.  
+Convert to RGBA.  
 `python rgba.py --dir_in="<folder_path>"`
 
-[grid.py](data/grid.py): Adjust grid placement.  
+Adjust grid placement.  
 `python grid.py --dir_in="<folder_path>" --dpi=300`
 
-[tile.py](data/tile.py): Create images for training data.  
+Create images for training data.  
 ```
 python tile.py \
 	--dir_in="scan/field_dpi300_rgba" \
@@ -56,10 +56,10 @@ python tile.py \
 
 ex. [tile](https://symbolfigures.io/thirdstudy/demo/tile.png)
 
-[tfrecord.py](data/tfrecord.py): Convert .png to .tfrecord.  
+Convert .png to .tfrecord.  
 `python tfrecord.py --dir_in="<folder_path>"`
 
-[tfrecord_reverse.py](data/tfrecord_reverse.py): Verify .tfrecord data by extracting .png.  
+Verify .tfrecord data by extracting .png.  
 `python tfrecord_reverse.py --dir_in="<folder_path>"`
 
 `cd ../`
@@ -84,12 +84,12 @@ Includes a further reduced GAN only capable of inference.
 
 `cd gen`
 
-[generate.py](data/generate.py): Generate random images for sythetic datasets.  
+Generate random images for sythetic datasets.  
 `python src/generate.py --model="<model_path>"`
 
 ex. [random](https://symbolfigures.io/thirdstudy/demo/random.png)
 
-[anim.py](data/anim.py): Bezier: continuous transformation follows a bezier curve passing through the model's _n_-dimensional latent space.  
+Bezier: continuous transformation follows a bezier curve passing through the model's _n_-dimensional latent space.  
 `python src/anim.py --style="bezier" --model="<model_path>"`
 
 ex. [bezier](https://symbolfigures.io/thirdstudy/demo/bezier.mp4)
@@ -103,7 +103,7 @@ Sine: dimensions of the latent space are modulated by a sine wave. The sine wave
 
 `cd fill`
 
-[fill.py](data/fill.py): Given a set of random generated images,
+Given a set of random generated images,
 - fill the shapes with color
 - remove the lines in between
 
