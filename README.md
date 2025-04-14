@@ -113,7 +113,7 @@ nvcc -shared -o blend.so blend.cu --compiler-options '-fPIC'
 python blend.py --dir_in="<folder_path>"
 ```
 
-[samples](fill/samples/) demonstrate the effect.
+[sample](fill/sample/) shows the effect.
 
 `cd ../`
 
