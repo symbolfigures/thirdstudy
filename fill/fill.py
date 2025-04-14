@@ -135,40 +135,28 @@ def process(args):
 				fill_shape((x, y), color, img, draw)
 
 	# fill line
-	for x in range(0, w, 1):
-		for y in range(0, h, 1):
+	for x in range(w):
+		for y in range(h):
 			if img.getpixel((x, y)) == (0, 0, 0):
 				fill_line(x, y, img, draw)
 
 	# blend
 	if blend:
 		trace = img
-		for x in range(0, w, 1):
-			for y in range(0, h, 1):
+		for x in range(w):
+			for y in range(h):
 				color = blend_px(x, y, trace)
 				draw.point((x, y), color)
 
 	img.save(f'{dir_out}/{filename}')
 
 
-def main(dir_in, dir_out, blend):
+def main(dir_in, dir_out, gpu):
 	os.makedirs(dir_out, exist_ok=True)
 	filenames = os.listdir(dir_in)
-	args = [(dir_in, x, dir_out, blend) for x in filenames]
+	args = [(dir_in, x, dir_out, gpu) for x in filenames]
 	with ProcessPoolExecutor() as executor:
 		executor.map(process, args)
-
-
-def main1(dir_in_sup, dir_out_sup):
-	filenames_sup = os.listdir(dir_in_sup)
-	for x_sup in filenames_sup:
-		dir_in = os.path.join(dir_in_sup, x_sup)
-		dir_out = os.path.join(dir_out_sup, x_sup)
-		os.makedirs(dir_out, exist_ok=True)
-		t1 = time.time()
-		super_process(dir_in, x_sup, dir_out)
-		t2 = time.time()
-		print(int(t2 - t1), x_sup)
 
 
 if __name__ == '__main__':
@@ -187,7 +175,7 @@ if __name__ == '__main__':
 		'--blend',
 		action='store_true',
 		default=False,
-		help='blend edges of shapes, no GPU support')
+		help='blend with no GPU support')
 	args = parser.parse_args()
 	main(args.dir_in, args.dir_out, args.blend)
 

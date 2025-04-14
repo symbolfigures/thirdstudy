@@ -44,10 +44,10 @@ Alternatively, freeze.txt has all the dependencies and versions explicit.
 `cd data`
 
 Convert to RGBA.  
-`python rgba.py --dir_in="scan/field_dpi300"`
+`python rgba.py --dir_in="<folder_path>"`
 
 Adjust grid placement.  
-`python grid.py --dir_in="scan/field_dpi300_rgba" --dpi=300`
+`python grid.py --dir_in="<folder_path>" --dpi=300`
 
 Create images for training data.  
 ```
@@ -58,10 +58,10 @@ python tile.py \
 ```
 
 Convert .png to .tfrecord.  
-`python tfrecord.py --dir_in="tile"`
+`python tfrecord.py --dir_in="<folder_path>"`
 
 Verify .tfrecord data by extracting .png.  
-`python tfrecord_reverse.py --dir_in="tfrecord"`
+`python tfrecord_reverse.py --dir_in="<folder_path>"`
 
 `cd ../`
 
@@ -86,13 +86,13 @@ Includes a further reduced GAN only capable of inference.
 `cd gen`
 
 Generate random images for sythetic datasets.  
-`python src/generate.py --model="<modelpath>"`
+`python src/generate.py --model="<model_path>"`
 
 Animation: continuous transformation follows a bezier curve passing through the model's _n_-dimensional latent space.  
-`python src/anim.py --style="bezier" --model="<modelpath>"`
+`python src/anim.py --style="bezier" --model="<model_path>"`
 
 Animation: dimensions of the latent space are modulated by a sine wave. The sine waves have constant period and variable phases.  
-`python src/anim.py --style="sine" --model="<modelpath>"`
+`python src/anim.py --style="sine" --model="<model_path>"`
 
 `cd ../`
 
@@ -103,8 +103,17 @@ Animation: dimensions of the latent space are modulated by a sine wave. The sine
 Given a set of random generated images,
 - fill the shapes with color
 - remove the lines in between
-- blend edges  
-`python fill.py --dir_in="../anim/out/random"`
+
+`python fill.py --dir_in="<folder_path>"`
+
+The `--blend` flag blends the edges, but is kind of slow. To accomplish the same with a GPU, use [blend.py](fill/blend.py) instead. First, compile [blend.cu](fill/blend.cu).
+
+```
+nvcc -shared -o blend.so blend.cu --compiler-options '-fPIC'
+python blend.py --dir_in="<folder_path>"
+```
+
+[samples](fill/samples/) demonstrate the effect.
 
 `cd ../`
 
