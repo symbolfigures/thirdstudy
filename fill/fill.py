@@ -12,14 +12,30 @@ sys.setrecursionlimit(10000000)
 
 
 def get_colors():
-	img = Image.open('palette.png')
+	img = Image.open('palet.png')
 	colors = []
 	for x in range(img.width):	
 		for y in range(img.height):
 			colors.append(img.getpixel((x, y)))
 	return colors
 
-colors = get_colors()
+
+def color_match(pix, overlay):
+	palet = Image.open(overlay)
+	colors = []
+	for p in pix:
+		colors.append(palet.getpixel(p))
+	R = 0
+	G = 0
+	B = 0
+	for c in colors:
+		R += c[0]
+		G += c[1]
+		B += c[2]
+	R = R // len(colors)
+	G = G // len(colors)
+	B = B // len(colors)
+	return (R, G, B)
 
 
 def bitmap(img):
@@ -29,7 +45,7 @@ def bitmap(img):
 	return Image.fromarray(array.astype(np.uint8))
 
 
-def fill_shape(point, color, img, draw):
+def get_shape(point, img, draw):
 	(w, h) = img.size
 	(x, y) = point
 	pix = []
@@ -50,10 +66,6 @@ def fill_shape(point, color, img, draw):
 			gather_pix(x, y + 1)
 
 	gather_pix(x, y)
-	if pix != []:
-		for p in pix:
-			draw.point(p, fill=color)
-
 	return pix
 
 
@@ -120,7 +132,7 @@ def blend_px(x, y, img):
 
 
 def process(args):
-	dir_in, filename, dir_out, blend = args
+	dir_in, dir_out, blend, overlay, filename = args
 
 	img = Image.open(f'{dir_in}/{filename}')
 	img = bitmap(img).convert('RGB')
@@ -131,8 +143,15 @@ def process(args):
 	for x in range(w):
 		for y in range(h):
 			if img.getpixel((x, y)) == (255, 255, 255):
-				color = colors[randrange(len(colors))]
-				fill_shape((x, y), color, img, draw)
+				pix = get_shape((x, y), img, draw)
+				if overlay is not None:
+					color = color_match(pix, overlay)
+				else:
+					color = colors[randrange(len(colors))]
+				if pix != []:
+					for p in pix:
+						draw.point(p, fill=color)
+
 
 	# fill line
 	for x in range(w):
@@ -151,10 +170,12 @@ def process(args):
 	img.save(f'{dir_out}/{filename}')
 
 
-def main(dir_in, dir_out, gpu):
+def main(dir_in, dir_out, blend, overlay):
+	if not overlay:
+		colors = get_colors()
 	os.makedirs(dir_out, exist_ok=True)
 	filenames = os.listdir(dir_in)
-	args = [(dir_in, x, dir_out, gpu) for x in filenames]
+	args = [(dir_in, dir_out, blend, overlay, x) for x in filenames]
 	with ProcessPoolExecutor() as executor:
 		executor.map(process, args)
 
@@ -176,8 +197,13 @@ if __name__ == '__main__':
 		action='store_true',
 		default=False,
 		help='blend with no GPU support')
+	parser.add_argument(
+		'--overlay',
+		type=str,
+		default=None,
+		help='pick colors according to underlying image. provide the path.')
 	args = parser.parse_args()
-	main(args.dir_in, args.dir_out, args.blend)
+	main(args.dir_in, args.dir_out, args.blend, args.overlay)
 
 
 

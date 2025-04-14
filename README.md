@@ -6,9 +6,6 @@ Scripts that
 - fill generated images with color to create a synthetic dataset.
 - make animations by orchestrating transformations through the model's latent space.
 
-The basic idea: [INPUT](https://symbolfigures.io/thirdstudy/png/2-01.png)
-[OUTPUT](https://symbolfigures.io/thirdstudy/anim/sample.mp4)
-
 The drawings I use are from my [Third Study](https://symbolfigures.io/thirdstudy.html). Generally, comptible drawings
 - fill the page within some rectangular margin.
 - may be flipped, and rotated by any degree.
@@ -57,6 +54,8 @@ python tile.py \
 	--resolution=1024
 ```
 
+ex. [tile](https://symbolfigures.io/thirdstudy/demo/tile.png)
+
 Convert .png to .tfrecord.  
 `python tfrecord.py --dir_in="<folder_path>"`
 
@@ -88,8 +87,12 @@ Includes a further reduced GAN only capable of inference.
 Generate random images for sythetic datasets.  
 `python src/generate.py --model="<model_path>"`
 
+ex. [random](https://symbolfigures.io/thirdstudy/demo/random.png)
+
 Animation: continuous transformation follows a bezier curve passing through the model's _n_-dimensional latent space.  
 `python src/anim.py --style="bezier" --model="<model_path>"`
+
+ex. [bezier](https://symbolfigures.io/thirdstudy/demo/bezier.mp4)
 
 Animation: dimensions of the latent space are modulated by a sine wave. The sine waves have constant period and variable phases.  
 `python src/anim.py --style="sine" --model="<model_path>"`
@@ -106,14 +109,22 @@ Given a set of random generated images,
 
 `python fill.py --dir_in="<folder_path>"`
 
-The `--blend` flag blends the edges, but is kind of slow. To accomplish the same with a GPU, use [blend.py](fill/blend.py) instead. First, compile [blend.cu](fill/blend.cu).
+ex. [fill](https://symbolfigures.io/thirdstudy/demo/fill.png)
+
+The `--blend` option blends the edges, but is kind of slow. To accomplish the same with a GPU, use [blend.py](fill/blend.py) instead. First, compile [blend.cu](fill/blend.cu).
 
 ```
 nvcc -shared -o blend.so blend.cu --compiler-options '-fPIC'
 python blend.py --dir_in="<folder_path>"
 ```
 
-[sample](fill/sample/) shows the effect.
+ex. [blend](https://symbolfigures.io/thirdstudy/demo/blend.png)
+
+The `--overlay` option includes a reference image to pick colors from, according to the shape's location relative to the image.
+
+`python fill.py --dir_in="<folder_path>" --overlay="<image_path>"`
+
+ex. [reference](https://symbolfigures.io/thirdstudy/demo/reference.png), [overlay](https://symbolfigures.io/thirdstudy/demo/overlay.png), [bezier](https://symbolfigures.io/thirdstudy/demo/overlay.mp4)
 
 `cd ../`
 

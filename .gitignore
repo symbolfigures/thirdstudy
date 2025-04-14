@@ -1,7 +1,11 @@
 .ipynb_checkpoints
 .venv/
+data/adjustment.json
 data/scan/
+demo/
 fill/blend.so
+fill/in/
+fill/out/
 gen/model/
 gen/out/
 gen/src/__pycache__/
