@@ -41,7 +41,7 @@ def color_match(pix, overlay):
 def bitmap(img):
 	img = img.convert('L')
 	array = np.array(img)
-	array = np.where(array > 128, 255, 0).astype(np.uint8)
+	array = np.where(array > 160, 255, 0).astype(np.uint8)
 	return Image.fromarray(array.astype(np.uint8))
 
 
@@ -204,26 +204,6 @@ if __name__ == '__main__':
 		help='pick colors according to underlying image. provide the path.')
 	args = parser.parse_args()
 	main(args.dir_in, args.dir_out, args.blend, args.overlay)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

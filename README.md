@@ -94,7 +94,7 @@ Generate random images for sythetic datasets.
 
 ex. [random](https://symbolfigures.io/thirdstudy/demo/random.png)
 
-Bezier: continuous transformation follows a bezier curve passing through the model's _n_-dimensional latent space.  
+Bezier: continuous transformation follows a looping bezier curve passing through the model's _n_-dimensional latent space.  
 `python src/anim.py --style="bezier" --model="<model_path>"`
 
 ex. [bezier](https://symbolfigures.io/thirdstudy/demo/bezier.mp4)
@@ -129,7 +129,7 @@ The `--overlay` option includes a reference image to pick colors from, according
 
 `python fill.py --dir_in="<folder_path>" --overlay="<image_path>"`
 
-ex. [reference](https://symbolfigures.io/thirdstudy/demo/reference.png), [overlay](https://symbolfigures.io/thirdstudy/demo/overlay.png), [bezier](https://symbolfigures.io/thirdstudy/demo/overlay.mp4)
+ex. [reference](https://symbolfigures.io/thirdstudy/demo/reference.png), [overlay](https://symbolfigures.io/thirdstudy/demo/overlay_random.png), [over a bezier curve](https://symbolfigures.io/thirdstudy/demo/overlay_bezier.mp4)
 
 `cd ../`
 
