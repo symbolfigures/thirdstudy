@@ -76,6 +76,11 @@ export TF_USE_LEGACY_KERAS=1
 python src/main_training.py "@params"
 ```
 
+Anyone is welcome to use this trained model for whatever purpose: [thirdstudy.ckpt](https://symbolfigures.io/thirdstudy/thirdstudy.ckpt)
+- resolution 1024 x 1024
+- latent size 512
+- other specs found in [params](train/params)
+
 `cd ../`
 
 ## Generate
