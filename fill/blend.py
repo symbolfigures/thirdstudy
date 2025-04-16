@@ -22,13 +22,8 @@ def main(dir_in, dir_out):
 	filenames = os.listdir(dir_in)
 	os.makedirs(dir_out, exist_ok=True)
 
-	# determine batch size
-	(w, h) = Image.open(f'{dir_in}/{filenames[0]}').size
-	im_mem = 2 * (w * h * 3)
-	free_mem = cuda.mem_get_info()[0]
-	b_size = int((free_mem / im_mem) * 0.8)
+	b_size = 640 # according to GPU capacity
 	num_b = (len(filenames) + b_size - 1) // b_size
-	#print(f'\nim_mem: {im_mem}\nfree_mem: {free_mem}\nb_size: {b_size}\nnum_b: {num_b}\n')
 
 	for b_idx in range(num_b):
 		b_files = filenames[b_idx * b_size:(b_idx + 1) * b_size]
