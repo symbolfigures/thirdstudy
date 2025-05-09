@@ -1,67 +1,56 @@
 #include <cuda_runtime.h>
 #include <iostream>
+#include <cstring>
 
-extern "C" void blendBatchCUDA(unsigned char *input, unsigned char *output, int w, int h, int batch_size);
+extern "C" void blendImageCUDA(unsigned char *input, unsigned char *output, int width, int height);
 
-__global__ void blendKernelBatch(unsigned char *input, unsigned char *output, int w, int h, int batch_size) {
-	int batch_idx = blockIdx.z;
-	int x = blockIdx.x * blockDim.x + threadIdx.x;
-	int y = blockIdx.y * blockDim.y + threadIdx.y;
+__global__ void blendKernel(unsigned char *input, unsigned char *output, int width, int height) {
+    int x = blockIdx.x * blockDim.x + threadIdx.x;
+    int y = blockIdx.y * blockDim.y + threadIdx.y;
 
-	if (x >= w || y >= h || batch_idx >= batch_size) return;
+    if (x >= width || y >= height) return;
 
-	int im_offset = batch_idx * w * h * 3;
-	int sumR = 0, sumG = 0, sumB = 0;
-	int count = 0;
+    int sumR = 0, sumG = 0, sumB = 0;
+    int count = 0;
 
-	// interate through the 3x3 grid
-	for (int dy = -1; dy <= 1; ++dy) {
-		for (int dx = -1; dx <= 1; ++dx) {
-			int nx = x + dx;
-			int ny = y + dy;
+    // Iterate through the 3x3 grid
+    for (int dy = -1; dy <= 1; ++dy) {
+        for (int dx = -1; dx <= 1; ++dx) {
+            int nx = x + dx;
+            int ny = y + dy;
 
-			// check bounds
-			if (nx >= 0 && ny >= 0 && nx < w && ny < h) {
-				int idx = (ny * w + nx) * 3;
-				sumR += input[idx];
-				sumG += input[idx + 1];
-				sumB += input[idx + 2];
-				++count;
-			}
-		}
-	}
+            // Check bounds
+            if (nx >= 0 && ny >= 0 && nx < width && ny < height) {
+                int idx = (ny * width + nx) * 3;
+                sumR += input[idx];
+                sumG += input[idx + 1];
+                sumB += input[idx + 2];
+                ++count;
+            }
+        }
+    }
 
-	// average
-	int idx = im_offset + (y * w + x) * 3;
-	output[idx] = sumR / count;
-	output[idx + 1] = sumG / count;
-	output[idx + 2] = sumB / count;
+    // Average the values
+    int idx = (y * width + x) * 3;
+    output[idx] = sumR / count;
+    output[idx + 1] = sumG / count;
+    output[idx + 2] = sumB / count;
 }
 
-extern "C" void blendBatchCUDA(unsigned char *input, unsigned char *output, int w, int h, int batch_size) {
-	unsigned char *d_input, *d_output;
-	size_t im_size = w * h * 3;
-	size_t batch_size_bytes = im_size * batch_size;
+extern "C" void blendImageCUDA(unsigned char *input, unsigned char *output, int width, int height) {
+    unsigned char *d_input, *d_output;
+    size_t size = width * height * 3 * sizeof(unsigned char);
 
-	cudaMalloc(&d_input, batch_size_bytes);
-	cudaMalloc(&d_output, batch_size_bytes);
-	cudaMemcpy(d_input, input, batch_size_bytes, cudaMemcpyHostToDevice);
+    cudaMalloc(&d_input, size);
+    cudaMalloc(&d_output, size);
+    cudaMemcpy(d_input, input, size, cudaMemcpyHostToDevice);
 
-	dim3 blockDim(16, 16);
-	dim3 gridDim((w + blockDim.x - 1) / blockDim.x, (h + blockDim.y - 1) / blockDim.y, batch_size);
-	blendKernelBatch<<<gridDim, blockDim>>>(d_input, d_output, w, h, batch_size);
+    dim3 blockDim(16, 16);
+    dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
+    blendKernel<<<gridDim, blockDim>>>(d_input, d_output, width, height);
 
-	cudaMemcpy(output, d_output, batch_size_bytes, cudaMemcpyDeviceToHost);
+    cudaMemcpy(output, d_output, size, cudaMemcpyDeviceToHost);
 
-	cudaFree(d_input);
-	cudaFree(d_output);
+    cudaFree(d_input);
+    cudaFree(d_output);
 }
-
-
-
-
-
-
-
-
-

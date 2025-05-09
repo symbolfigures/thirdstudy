@@ -1,74 +1,54 @@
-import argparse
 import ctypes
 import numpy as np
 import os
 from PIL import Image
-import pycuda.driver as cuda
-import pycuda.autoinit
 
-# load CUDA library
-blend_lib = ctypes.CDLL('./blend.so')
+# Load the CUDA shared library
+blend_lib = ctypes.CDLL('./blend_1.so')
 
-# define function signature
-blend_lib.blendBatchCUDA.argtypes = [
-	ctypes.POINTER(ctypes.c_ubyte),
-	ctypes.POINTER(ctypes.c_ubyte),
-	ctypes.c_int,
-	ctypes.c_int,
-	ctypes.c_int
+# Define the function signature
+blend_lib.blendImageCUDA.argtypes = [
+    ctypes.POINTER(ctypes.c_ubyte),  # Input image pointer
+    ctypes.POINTER(ctypes.c_ubyte),  # Output image pointer
+    ctypes.c_int,                   # Image width
+    ctypes.c_int                    # Image height
 ]
 
-def main(dir_in, dir_out):
-	filenames = os.listdir(dir_in)
-	os.makedirs(dir_out, exist_ok=True)
+dir_in = 'out_blend_1'
+dir_out = 'out_blend_2'
+filenames = os.listdir(dir_in)
 
-	b_size = 640 # according to GPU capacity
-	num_b = (len(filenames) + b_size - 1) // b_size
+for filename in filenames:
+	filepath = f'{dir_in}/{filename}'
 
-	for b_idx in range(num_b):
-		b_files = filenames[b_idx * b_size:(b_idx + 1) * b_size]
+	# Load the image
+	im = Image.open(filepath).convert('RGB')
+	im_array = np.array(im, dtype=np.uint8)
+	h, w, c = im_array.shape
 
-		# load images
-		im_arrs = []
-		for filename in b_files:
-			im = Image.open(os.path.join(dir_in, filename))
-			im_arr = np.array(im, dtype=np.uint8)
-			im_arrs.append(im_arr)
+	# Prepare input and output buffers
+	in_im = im_array.ravel()
+	out_im = np.zeros_like(in_im, dtype=np.uint8)
 
-		h, w, c = im_arrs[0].shape
+	# Create pointers to the input and output arrays
+	in_ptr = in_im.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte))
+	out_ptr = out_im.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte))
 
-		# i/o buffers
-		b_in = np.concatenate([im.ravel() for im in im_arrs]).astype(np.uint8)
-		b_out = np.zeros_like(b_in, dtype=np.uint8)
+	# Call the CUDA function
+	blend_lib.blendImageCUDA(in_ptr, out_ptr, w, h)
 
-		# pointers
-		in_ptr = b_in.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte))
-		out_ptr = b_out.ctypes.data_as(ctypes.POINTER(ctypes.c_ubyte))
-
-		# call CUDA function
-		blend_lib.blendBatchCUDA(in_ptr, out_ptr, w, h, len(b_files))
-
-		# save
-		b_out = b_out.reshape(len(b_files), h, w, c)
-		for i, filename in enumerate(b_files):
-			out_im = Image.fromarray(b_out[i], mode='RGB')
-			out_im.save(f'{dir_out}/{filename}')
+	# Reshape the output and save the result
+	out_im = out_im.reshape((h, w, c))
+	out_im = Image.fromarray(out_im, mode='RGB')
+	out_im.save(f'{dir_out}/{filename}')
 
 
-if __name__ == '__main__':
-	parser = argparse.ArgumentParser()
-	parser.add_argument(
-		'--dir_in',
-		type=str,
-		required=True,
-		help='path to source images folder')
-	parser.add_argument(
-		'--dir_out',
-		type=str,
-		default='out_blend',
-		help='output folder')
-	args = parser.parse_args()
-	main(args.dir_in, args.dir_out)
+
+
+
+
+
+
 
 
 

@@ -26,6 +26,8 @@ import numpy as np
 import os
 from PIL import Image
 
+Image.MAX_IMAGE_PIXELS = 277813800
+
 
 def worker(args):
 	i, filepath, dir_out = args
@@ -54,8 +56,10 @@ def main(dir_in):
 	os.makedirs(dir_out, exist_ok=True)
 	filepaths = [f'{dir_in}/{f}' for f in os.listdir(dir_in)]
 	args = [(i, f, dir_out) for i, f in enumerate(filepaths)]
-	with ProcessPoolExecutor() as executor:
-		executor.map(worker, args)
+	#with ProcessPoolExecutor() as executor:
+		#executor.map(worker, args)
+	for i in range(len(args)):
+		worker(args[i])
 
 
 if __name__ == '__main__':

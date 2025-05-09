@@ -8,6 +8,9 @@ def png_to_mp4(dir_in):
 	(
 		ffmpeg
 			.input(f'{dir_in}/*.png', pattern_type='glob', framerate=32)
+			.filter('format', 'rgba')
+    		.filter('colorchannelmixer', aa=0)
+			.filter('color', color='white')
 			.output(dir_out, vcodec='libx264', pix_fmt='yuv420p')
 			.run()
 	)

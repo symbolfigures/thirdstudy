@@ -103,6 +103,7 @@ def main(args):
 	) for i in range(len(adj))]
 	with ProcessPoolExecutor() as executor:
 		executor.map(worker, args)
+	#worker(args[0]) # debug
 
 
 if __name__ == '__main__':
@@ -149,7 +150,6 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 	main(args)
-
 
 
 
