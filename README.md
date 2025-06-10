@@ -40,8 +40,7 @@ Alternatively, freeze.txt has all the dependencies and versions explicit.
 
 `cd data`
 
-Convert to RGBA.  
-`python rgba.py --dir_in="<folder_path>"`
+The scans should be prepared as PNG files in RGB mode.
 
 Adjust grid placement.  
 `python grid.py --dir_in="<folder_path>" --dpi=300`
@@ -75,11 +74,6 @@ Train the model, passing parameters in ./params file.
 export TF_USE_LEGACY_KERAS=1
 python src/main_training.py "@params"
 ```
-
-Anyone is welcome to use this trained model for whatever purpose: [thirdstudy300.ckpt](https://symbolfigures.io/thirdstudy/thirdstudy300.ckpt)
-- resolution 1024 x 1024
-- latent size 512
-- other specs found in [params](train/params)
 
 `cd ../`
 

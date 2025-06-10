@@ -11,7 +11,7 @@ from PIL import Image
 import random
 import time
 
-Image.MAX_IMAGE_PIXELS = None
+Image.MAX_IMAGE_PIXELS = 277813800
 
 
 def worker(args):
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 		'--dir_in',
 		type=str,
 		required=True,
-		help='folder of source images e.g. scan/field_dpi300_rgba')
+		help='folder of source images e.g. scan/thirdstudy_300_rgb')
 	parser.add_argument(
 		'--dir_out',
 		type=str,
@@ -150,8 +150,6 @@ if __name__ == '__main__':
 
 	args = parser.parse_args()
 	main(args)
-
-
 
 
 

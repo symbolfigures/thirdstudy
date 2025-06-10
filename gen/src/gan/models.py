@@ -36,7 +36,7 @@ def conv_2d(
 
 def create_generator_body(resolution, latent_vector):
     def to_rgb(x):
-        rgb = conv_2d(x, 4, 1, activation=None, name=f'to_rgb_{resolution}x{resolution}')
+        rgb = conv_2d(x, 3, 1, activation=None, name=f'to_rgb_{resolution}x{resolution}')
         return rgb
 
     resolution_to_channel_counts = {

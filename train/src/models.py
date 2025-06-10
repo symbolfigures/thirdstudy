@@ -36,7 +36,7 @@ def conv_2d(
 
 def create_generator_body(resolution, latent_vector):
     def to_rgb(x):
-        rgb = conv_2d(x, 4, 1, activation=None, name=f'to_rgb_{resolution}x{resolution}')
+        rgb = conv_2d(x, 3, 1, activation=None, name=f'to_rgb_{resolution}x{resolution}')
         return rgb
 
     resolution_to_channel_counts = {
@@ -132,7 +132,7 @@ def make_discriminator_body(tf_format_image, resolution):
 def create_discriminator(input_resolution: int) -> tf.keras.Model:
     validate_resolution(input_resolution)
 
-    image = tf.keras.layers.Input((input_resolution, input_resolution, 4))
+    image = tf.keras.layers.Input((input_resolution, input_resolution, 3))
 
     x = make_discriminator_body(image, 4)
     x = tf.keras.layers.Flatten()(x)
