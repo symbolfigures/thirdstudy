@@ -7,6 +7,7 @@ import pickle
 import sys
 import tensorflow as tf
 import time
+from train import TrainingState
 import uuid
 
 

@@ -1,9 +1,9 @@
 import argparse
 import ffmpeg
-from generate import generate, load_generator
 import os
-import time
 import tensorflow as tf
+import time
+from generate import generate, load_generator
 
 
 def get_subdir_out(
